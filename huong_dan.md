@@ -4,15 +4,14 @@ Tài liệu này dành cho người dùng không chuyên kỹ thuật.
 
 ## 1. Mở PowerShell
 
-1. Mở thư mục chứa công cụ.
+1. Mở thư mục chứa tool.
 2. Bấm chuột phải vào vùng trống trong thư mục.
 3. Chọn **Open in Terminal** hoặc **Open PowerShell window here**.
-
-Nếu đang ở ổ `Z:`, có thể thấy dòng giống như:
-
-```powershell
-PS Z:\>
-```
+    ![alt text](docs/img/img1.png)
+4. Dán các lệnh bên dưới, đợi cỡ 5 - 10s để nó quét:
+    ![alt text](docs/img/img2.png)
+4. Sau khi quét xong tool tự mở trình duyệt để xem báo cáo:
+    ![alt text](docs/img/img3.png)
 
 ## 2. Chạy kiểm tra cơ bản
 
