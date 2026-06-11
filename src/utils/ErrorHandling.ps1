@@ -51,5 +51,5 @@ function Write-AuditError {
         [System.Management.Automation.ErrorRecord]$ErrorRecord
     )
 
-    Write-Error "$Message $($ErrorRecord.Exception.Message)"
+    Write-Error -Message "$Message $($ErrorRecord.Exception.Message)" -ErrorAction Continue
 }

@@ -47,6 +47,24 @@ function Import-AuditModule {
     . $Path
 }
 
+function Write-TopLevelAuditError {
+    <#
+    .SYNOPSIS
+        Writes top-level failures even when shared error helpers fail to load.
+    #>
+    param(
+        [Parameter(Mandatory)]
+        [System.Management.Automation.ErrorRecord]$ErrorRecord
+    )
+
+    if (Get-Command -Name Write-AuditError -CommandType Function -ErrorAction SilentlyContinue) {
+        Write-AuditError -Message 'Audit failed.' -ErrorRecord $ErrorRecord
+        return
+    }
+
+    Write-Error -Message "Audit failed. $($ErrorRecord.Exception.Message)" -ErrorAction Continue
+}
+
 try {
     $modulePaths = @(
         'utils\ErrorHandling.ps1',
@@ -99,6 +117,6 @@ try {
     Write-Output "JSON report exported to: $jsonPath"
 }
 catch {
-    Write-AuditError -Message 'Audit failed.' -ErrorRecord $_
+    Write-TopLevelAuditError -ErrorRecord $_
     exit 1
 }
