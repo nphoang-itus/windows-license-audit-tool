@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "0.1.0",
+  "readOnlyMode": true,
+  "reporting": {
+    "defaultFormat": "json",
+    "futureFormats": ["html", "docx", "pdf"]
+  },
+  "suspiciousScan": {
+    "enabledByDefault": false,
+    "deepScanImplemented": false
+  }
+}
