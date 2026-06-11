@@ -28,10 +28,10 @@ if ($VerboseMode) {
     $VerbosePreference = 'Continue'
 }
 
-function Import-AuditModule {
+function Resolve-AuditModulePath {
     <#
     .SYNOPSIS
-        Dot-sources a local PowerShell module file with defensive error handling.
+        Resolves a local PowerShell module file with defensive error handling.
     #>
     param(
         [Parameter(Mandatory)]
@@ -44,7 +44,25 @@ function Import-AuditModule {
     }
 
     Write-Verbose "Loading module: $Path"
-    . $Path
+    return $Path
+}
+
+function Write-TopLevelAuditError {
+    <#
+    .SYNOPSIS
+        Writes top-level failures even when shared error helpers fail to load.
+    #>
+    param(
+        [Parameter(Mandatory)]
+        [System.Management.Automation.ErrorRecord]$ErrorRecord
+    )
+
+    if (Get-Command -Name Write-AuditError -CommandType Function -ErrorAction SilentlyContinue) {
+        Write-AuditError -Message 'Audit failed.' -ErrorRecord $ErrorRecord
+        return
+    }
+
+    Write-Error -Message "Audit failed. $($ErrorRecord.Exception.Message)" -ErrorAction Continue
 }
 
 function Write-TopLevelAuditError {
@@ -82,7 +100,8 @@ try {
     )
 
     foreach ($relativePath in $modulePaths) {
-        Import-AuditModule -Path (Join-Path -Path $PSScriptRoot -ChildPath $relativePath)
+        $modulePath = Resolve-AuditModulePath -Path (Join-Path -Path $PSScriptRoot -ChildPath $relativePath)
+        . $modulePath
     }
 
     Ensure-AuditDirectory -Path $OutputDir | Out-Null
