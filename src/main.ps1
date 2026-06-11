@@ -3,8 +3,8 @@
     Entry point for the read-only Windows License Audit Tool.
 
 .DESCRIPTION
-    Loads collector, rule, report, and utility modules; gathers placeholder audit data;
-    normalizes and masks sensitive values; evaluates read-only rules; and exports JSON.
+    Loads collector, rule, report, and utility modules; gathers read-only audit data;
+    normalizes and masks sensitive values; evaluates read-only rules; and exports JSON and HTML.
     This script must not activate Windows or Office, change keys, delete files, or remove software.
 #>
 
@@ -96,7 +96,8 @@ try {
         'rules\LicenseRules.ps1',
         'rules\SuspiciousRules.ps1',
         'rules\RuleEngine.ps1',
-        'report\JsonReport.ps1'
+        'report\JsonReport.ps1',
+        'report\HtmlReport.ps1'
     )
 
     foreach ($relativePath in $modulePaths) {
@@ -106,7 +107,11 @@ try {
 
     Ensure-AuditDirectory -Path $OutputDir | Out-Null
 
-    Write-Verbose 'Collecting read-only audit data.'
+    Write-Verbose 'Collecting read-only system and hardware data.'
+    $systemInfo = Get-SystemAuditInfo
+    $hardwareInfo = Get-HardwareAuditInfo
+
+    Write-Verbose 'Collecting read-only license and suspicious indicator data.'
     if ($IncludeSuspiciousScan) {
         $suspiciousIndicators = Get-SuspiciousIndicatorAuditInfo
     }
@@ -115,8 +120,8 @@ try {
     }
 
     $rawAuditData = [ordered]@{
-        System               = Get-SystemAuditInfo
-        Hardware             = Get-HardwareAuditInfo
+        System               = $systemInfo
+        Hardware             = $hardwareInfo
         WindowsLicense       = Get-WindowsLicenseAuditInfo
         OfficeLicense        = Get-OfficeLicenseAuditInfo
         SuspiciousIndicators = $suspiciousIndicators
@@ -133,7 +138,9 @@ try {
     $safeReport = Protect-AuditReportSensitiveData -InputObject $normalizedAuditData
 
     $jsonPath = Export-AuditJsonReport -AuditReport $safeReport -OutputDir $OutputDir
+    $htmlPath = Export-AuditHtmlReport -AuditReport $safeReport -OutputDir $OutputDir
     Write-Output "JSON report exported to: $jsonPath"
+    Write-Output "HTML report exported to: $htmlPath"
 }
 catch {
     Write-TopLevelAuditError -ErrorRecord $_

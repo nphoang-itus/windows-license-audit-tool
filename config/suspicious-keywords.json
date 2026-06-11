@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "0.1.0",
+  "keywords": [
+    { "keyword": "kmsauto", "riskWeight": 95 },
+    { "keyword": "kmspico", "riskWeight": 95 },
+    { "keyword": "kms pico", "riskWeight": 95 },
+    { "keyword": "auto kms", "riskWeight": 90 },
+    { "keyword": "autokms", "riskWeight": 90 },
+    { "keyword": "kms activator", "riskWeight": 90 },
+    { "keyword": "office activator", "riskWeight": 90 },
+    { "keyword": "windows activator", "riskWeight": 90 },
+    { "keyword": "re-loader", "riskWeight": 85 },
+    { "keyword": "reloader", "riskWeight": 85 },
+    { "keyword": "microsoft toolkit", "riskWeight": 80 },
+    { "keyword": "ratiborus", "riskWeight": 80 },
+    { "keyword": "hwidgen", "riskWeight": 75 },
+    { "keyword": "digital license activator", "riskWeight": 75 },
+    { "keyword": "aact", "riskWeight": 70 },
+    { "keyword": "vlmcsd", "riskWeight": 70 },
+    { "keyword": "fake kms", "riskWeight": 70 }
+  ]
+}

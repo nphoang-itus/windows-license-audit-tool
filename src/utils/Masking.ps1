@@ -19,6 +19,71 @@ function Protect-SensitiveValue {
         [object]$Value
     )
 
+    return Protect-SerialNumber -Value $Value
+}
+
+function Protect-UserName {
+    <#
+    .SYNOPSIS
+        Redacts usernames with a stable placeholder.
+    #>
+    [CmdletBinding()]
+    param(
+        [AllowNull()]
+        [object]$Value
+    )
+
+    if ($null -eq $Value) {
+        return $null
+    }
+
+    if ([string]::IsNullOrWhiteSpace([string]$Value)) {
+        return [string]$Value
+    }
+
+    return '<REDACTED_USER>'
+}
+
+function Protect-MacAddress {
+    <#
+    .SYNOPSIS
+        Masks middle MAC address bytes while preserving the vendor and final byte.
+    #>
+    [CmdletBinding()]
+    param(
+        [AllowNull()]
+        [object]$Value
+    )
+
+    if ($null -eq $Value) {
+        return $null
+    }
+
+    $text = ([string]$Value).Trim()
+    if ([string]::IsNullOrWhiteSpace($text)) {
+        return $text
+    }
+
+    $separator = if ($text -match '-') { '-' } else { ':' }
+    $parts = $text -split '[:-]'
+    if ($parts.Count -ne 6) {
+        return Protect-SerialNumber -Value $text
+    }
+
+    return ($parts[0], $parts[1], 'XX', 'XX', 'XX', $parts[5]) -join $separator
+}
+
+function Protect-SerialNumber {
+    <#
+    .SYNOPSIS
+        Preserves the first three and last four characters of serial-like values.
+    #>
+    [CmdletBinding()]
+    param(
+        [AllowNull()]
+        [object]$Value
+    )
+
     if ($null -eq $Value) {
         return $null
     }
@@ -28,11 +93,36 @@ function Protect-SensitiveValue {
         return $text
     }
 
-    if ($text.Length -le 4) {
-        return '****'
+    if ($text.Length -le 7) {
+        return ('*' * $text.Length)
     }
 
-    return ('****' + $text.Substring($text.Length - 4))
+    return ('{0}****{1}' -f $text.Substring(0, 3), $text.Substring($text.Length - 4))
+}
+
+function Protect-SensitiveValueOrCollection {
+    <#
+    .SYNOPSIS
+        Applies a scalar masking function to a scalar or every item in a collection.
+    #>
+    [CmdletBinding()]
+    param(
+        [AllowNull()]
+        [object]$Value,
+
+        [Parameter(Mandatory)]
+        [scriptblock]$Masker
+    )
+
+    if ($Value -is [System.Collections.IEnumerable] -and $Value -isnot [string]) {
+        $items = @()
+        foreach ($item in $Value) {
+            $items += & $Masker $item
+        }
+        return ,$items
+    }
+
+    return & $Masker $Value
 }
 
 function Protect-AuditReportSensitiveData {
@@ -47,13 +137,24 @@ function Protect-AuditReportSensitiveData {
         [object]$InputObject
     )
 
-    $sensitiveNamePattern = '(?i)(serial|mac|user(name)?|product.?key|partial.?key|key|sid)'
+    $serialNamePattern = '(?i)(serial|product.?key|partial.?key|key|sid)'
+    $macNamePattern = '(?i)mac'
+    $userNamePattern = '(?i)user(name)?'
 
     if ($InputObject -is [System.Collections.IDictionary]) {
         $masked = [ordered]@{}
         foreach ($key in $InputObject.Keys) {
-            if ($key -match $sensitiveNamePattern) {
-                $masked[$key] = Protect-SensitiveValue -Value $InputObject[$key]
+            if ($key -match '(?i)^(PartialProductKey|InstalledProductKeyLast5)$') {
+                $masked[$key] = $InputObject[$key]
+            }
+            elseif ($key -match $userNamePattern) {
+                $masked[$key] = Protect-SensitiveValueOrCollection -Value $InputObject[$key] -Masker ${function:Protect-UserName}
+            }
+            elseif ($key -match $macNamePattern) {
+                $masked[$key] = Protect-SensitiveValueOrCollection -Value $InputObject[$key] -Masker ${function:Protect-MacAddress}
+            }
+            elseif ($key -match $serialNamePattern) {
+                $masked[$key] = Protect-SensitiveValueOrCollection -Value $InputObject[$key] -Masker ${function:Protect-SerialNumber}
             }
             else {
                 $masked[$key] = Protect-AuditReportSensitiveData -InputObject $InputObject[$key]

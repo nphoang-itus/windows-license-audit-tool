@@ -1,0 +1,15 @@
+{
+  "WindowsLicense": {
+    "LicenseStatusCode": 1,
+    "LicenseStatusText": "Licensed",
+    "LicenseDescription": "Windows(R) Operating System, VOLUME_KMSCLIENT channel",
+    "KmsHost": "unknown-kms.example.test"
+  },
+  "OfficeLicense": {
+    "Status": "NotDetected",
+    "Products": []
+  },
+  "SuspiciousIndicators": {
+    "Indicators": []
+  }
+}

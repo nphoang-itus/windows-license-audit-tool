@@ -1,0 +1,25 @@
+{
+  "WindowsLicense": {
+    "LicenseStatusCode": 1,
+    "LicenseStatusText": "Licensed",
+    "LicenseDescription": "Windows(R) Operating System, OEM_DM channel",
+    "OemKeyPresent": true,
+    "KmsHost": null
+  },
+  "OfficeLicense": {
+    "Status": "NotDetected",
+    "Products": []
+  },
+  "SuspiciousIndicators": {
+    "Indicators": [
+      {
+        "Source": "LimitedFileScan",
+        "MatchedKeyword": "kmsauto",
+        "ItemName": "kmsauto-note.txt",
+        "ItemPathMasked": "C:\\Users\\<REDACTED_USER>\\Downloads\\kmsauto-note.txt",
+        "RiskWeight": 95,
+        "EvidenceType": "FileName"
+      }
+    ]
+  }
+}

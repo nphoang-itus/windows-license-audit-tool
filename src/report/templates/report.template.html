@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <title>{{TITLE}}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm 18mm;
+        }
+
+        body {
+            background: #f2f2f2;
+            color: #111;
+            font-family: "Times New Roman", Times, serif;
+            font-size: 13pt;
+            line-height: 1.35;
+            margin: 0;
+        }
+
+        .page {
+            box-sizing: border-box;
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 20mm 18mm;
+            background: #fff;
+        }
+
+        h1 {
+            font-size: 16pt;
+            margin: 0 0 12pt;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            font-size: 13pt;
+            margin: 16pt 0 6pt;
+            text-transform: uppercase;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 6pt 0 10pt;
+        }
+
+        th,
+        td {
+            border: 1px solid #222;
+            padding: 5pt 6pt;
+            text-align: left;
+            vertical-align: top;
+            word-break: break-word;
+        }
+
+        th {
+            width: 35%;
+            background: #efefef;
+            font-weight: bold;
+        }
+
+        .wide th {
+            width: auto;
+            text-align: center;
+        }
+
+        .meta th {
+            width: 28%;
+        }
+
+        .risk-normal {
+            color: #111;
+            font-weight: normal;
+        }
+
+        .risk-warning {
+            color: #8a5a00;
+            font-weight: bold;
+        }
+
+        .risk-high {
+            color: #9b111e;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .comments {
+            border: 1px solid #222;
+            padding: 8pt 10pt;
+            margin-top: 6pt;
+        }
+
+        .comments p {
+            margin: 0 0 6pt;
+        }
+
+        ul {
+            margin: 4pt 0 8pt 18pt;
+            padding: 0;
+        }
+
+        .signature {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20mm;
+            margin-top: 22mm;
+            text-align: center;
+        }
+
+        .signature-line {
+            margin-top: 22mm;
+            border-top: 1px solid #222;
+            padding-top: 4pt;
+        }
+
+        @media print {
+            body {
+                background: #fff;
+            }
+
+            .page {
+                margin: 0;
+                box-shadow: none;
+                width: auto;
+                min-height: auto;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <h1>{{TITLE}}</h1>
+
+        <table class="meta">
+            <tbody>
+                <tr><th>Th&#7901;i &#273;i&#7875;m tr&#237;ch xu&#7845;t</th><td>{{EXTRACTION_TIME}}</td></tr>
+                <tr><th>T&#234;n m&#225;y t&#237;nh</th><td>{{PC_NAME}}</td></tr>
+                <tr><th>T&#224;i kho&#7843;n &#273;ang &#273;&#259;ng nh&#7853;p</th><td>{{LOGGED_IN_ACCOUNT}}</td></tr>
+                <tr><th>Domain / Workgroup</th><td>{{DOMAIN_OR_WORKGROUP}}</td></tr>
+            </tbody>
+        </table>
+
+        <h2>I. B&#7843;ng d&#7845;u v&#226;n tay ph&#7847;n c&#7913;ng</h2>
+        <table>
+            <tbody>
+                {{HARDWARE_ROWS}}
+            </tbody>
+        </table>
+
+        <h2>II. Th&#244;ng tin Windows v&#224; b&#7843;n quy&#7873;n</h2>
+        <table>
+            <tbody>
+                {{WINDOWS_ROWS}}
+            </tbody>
+        </table>
+
+        <h2>III. Th&#244;ng tin Office v&#224; b&#7843;n quy&#7873;n</h2>
+        <table class="wide">
+            <thead>
+                <tr>
+                    <th>S&#7843;n ph&#7849;m</th>
+                    <th>T&#234;n gi&#7845;y ph&#233;p</th>
+                    <th>M&#244; t&#7843; / k&#234;nh</th>
+                    <th>Tr&#7841;ng th&#225;i</th>
+                    <th>5 k&#253; t&#7921; cu&#7889;i key</th>
+                    <th>KMS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{OFFICE_ROWS}}
+            </tbody>
+        </table>
+
+        <h2>IV. Nh&#7853;n x&#233;t t&#7921; &#273;&#7897;ng c&#7911;a c&#244;ng c&#7909;</h2>
+        <div class="comments {{RISK_CLASS}}">
+            <p><strong>&#272;&#225;nh gi&#225; t&#7893;ng th&#7875;:</strong> {{OVERALL_RISK}}</p>
+            <p><strong>&#272;i&#7875;m r&#7911;i ro:</strong> {{RISK_SCORE}}</p>
+            <p><strong>Windows:</strong> {{WINDOWS_VERDICT}}</p>
+            <p><strong>Office:</strong> {{OFFICE_VERDICT}}</p>
+            <p><strong>Ch&#7881; b&#225;o nghi v&#7845;n:</strong> {{SUSPICIOUS_VERDICT}}</p>
+            <p>{{CAUTIOUS_ASSESSMENT}}</p>
+            <p><strong>C&#259;n c&#7913; t&#7921; &#273;&#7897;ng:</strong></p>
+            <ul>
+                {{REASONS}}
+            </ul>
+            <p><strong>Ki&#7871;n ngh&#7883;:</strong></p>
+            <ul>
+                {{RECOMMENDATIONS}}
+            </ul>
+        </div>
+
+        <h2>V. Ch&#7919; k&#253; x&#225;c nh&#7853;n</h2>
+        <section class="signature">
+            <div>
+                <strong>Ng&#432;&#7901;i th&#7921;c hi&#7879;n tr&#237;ch xu&#7845;t</strong>
+                <div class="signature-line">K&#253;, ghi r&#245; h&#7885; t&#234;n</div>
+            </div>
+            <div>
+                <strong>&#272;&#7841;i di&#7879;n &#273;&#417;n v&#7883; / b&#7897; ph&#7853;n</strong>
+                <div class="signature-line">K&#253;, ghi r&#245; h&#7885; t&#234;n</div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

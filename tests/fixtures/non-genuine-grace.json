@@ -1,0 +1,16 @@
+{
+  "WindowsLicense": {
+    "LicenseStatusCode": 4,
+    "LicenseStatusText": "Non-Genuine Grace Period",
+    "LicenseDescription": "Windows(R) Operating System, RETAIL channel",
+    "OemKeyPresent": false,
+    "KmsHost": null
+  },
+  "OfficeLicense": {
+    "Status": "NotDetected",
+    "Products": []
+  },
+  "SuspiciousIndicators": {
+    "Indicators": []
+  }
+}

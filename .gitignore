@@ -1,0 +1,34 @@
+# Generated reports
+exports/
+exports/*.html
+exports/*.json
+
+# PowerShell and logs
+*.log
+*.tmp
+*.bak
+*.ps1xml.bak
+Transcript*.txt
+
+# Test and coverage output
+TestResults/
+coverage/
+*.coverage
+
+# Editor and OS files
+.vscode/
+.idea/
+*.swp
+*.swo
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Local archives/packages
+*.zip
+*.7z
+*.tar
+*.gz
+*.7z
+*.tar
+*.gz

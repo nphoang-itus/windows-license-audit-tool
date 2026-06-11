@@ -1,0 +1,23 @@
+{
+  "WindowsLicense": {
+    "LicenseStatusCode": 1,
+    "LicenseStatusText": "Licensed",
+    "LicenseDescription": "Windows(R) Operating System, OEM_DM channel",
+    "OemKeyPresent": true,
+    "KmsHost": null
+  },
+  "OfficeLicense": {
+    "Status": "Complete",
+    "Products": [
+      {
+        "ProductName": "Office 16",
+        "LicenseStatus": "---NOTIFICATIONS---",
+        "LicenseDescriptionOrChannel": "Office 16, RETAIL channel",
+        "KmsMachineName": null
+      }
+    ]
+  },
+  "SuspiciousIndicators": {
+    "Indicators": []
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "WindowsLicense": {
+    "LicenseStatusCode": 1,
+    "LicenseStatusText": "Licensed",
+    "LicenseDescription": "Windows(R) Operating System, OEM_DM channel",
+    "OemKeyPresent": true,
+    "KmsHost": null
+  },
+  "OfficeLicense": {
+    "Status": "NotDetected",
+    "Products": []
+  },
+  "SuspiciousIndicators": {
+    "Indicators": [
+      {
+        "Source": "ScheduledTask",
+        "MatchedKeyword": "kmsauto",
+        "ItemName": "KMSAuto Update",
+        "ItemPathMasked": "\\KMSAuto Update",
+        "RiskWeight": 95,
+        "EvidenceType": "ScheduledTask"
+      }
+    ]
+  }
+}

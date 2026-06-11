@@ -1,79 +1,181 @@
 # Windows License Audit Tool
 
-Initial skeleton for a read-only Windows and Office license audit tool.
+A read-only Windows and Office license audit tool.
 
-The first supported output is a normalized JSON report. HTML, DOCX, and PDF reports are planned for later.
+The tool exports:
 
-## Scope
+- A normalized JSON report.
+- An administrative-style HTML report that opens in the default browser when using the runner script.
 
-The tool is designed to collect:
+The tool is designed for audit and review. It does not activate, deactivate, install keys, remove keys, delete files, stop services, modify scheduled tasks, or change licensing state.
 
-- System information
-- Hardware information
-- Windows license information
-- Office license information
-- Suspicious indicator information
-- Rule-engine findings
+## Quick Start
 
-Current collectors and rules are placeholders. Deep scanning is not implemented yet.
-
-## Safety Rules
-
-This tool must remain read-only. It must not:
-
-- Activate or deactivate Windows or Office
-- Install, remove, or modify product keys
-- Delete files
-- Remove software
-- Stop services
-- Modify scheduled tasks
-- Change registry policy or licensing state
-
-Sensitive values such as serial numbers, MAC addresses, usernames, SIDs, and product keys are masked before JSON export.
-
-## Requirements
-
-- Windows PowerShell 5.1 or PowerShell 7+
-- Run from a PowerShell session with permission to write to the selected output directory
-
-No external PowerShell modules are required for the current skeleton.
-
-## Usage
-
-From the project root:
+Open PowerShell in the project folder and run:
 
 ```powershell
-.\src\main.ps1
+powershell.exe -ExecutionPolicy Bypass -NoProfile -File .\run-audit.ps1
 ```
 
-Specify a report directory:
+This exports JSON and HTML reports to `exports\` and opens the HTML report in your default browser.
+
+Run without opening the browser:
 
 ```powershell
-.\src\main.ps1 -OutputDir .\exports
+powershell.exe -ExecutionPolicy Bypass -NoProfile -File .\run-audit.ps1 -NoOpen
 ```
 
-Request suspicious indicator placeholders:
+Run with the optional suspicious indicator file-name scan:
 
 ```powershell
-.\src\main.ps1 -IncludeSuspiciousScan
+powershell.exe -ExecutionPolicy Bypass -NoProfile -File .\run-audit.ps1 -IncludeSuspiciousScan
 ```
 
-Enable verbose logging:
+Use a custom output directory:
 
 ```powershell
-.\src\main.ps1 -VerboseMode
+powershell.exe -ExecutionPolicy Bypass -NoProfile -File .\run-audit.ps1 -OutputDir C:\Temp\AuditReports
 ```
 
-Combine options:
+For a short Vietnamese end-user guide, see [huong_dan.md](huong_dan.md).
+
+## Execution Policy
+
+If PowerShell blocks scripts, use a temporary process-level bypass:
 
 ```powershell
-.\src\main.ps1 -OutputDir .\exports -IncludeSuspiciousScan -VerboseMode
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\run-audit.ps1
+```
+
+Or run the script directly with:
+
+```powershell
+powershell.exe -ExecutionPolicy Bypass -NoProfile -File .\run-audit.ps1
+```
+
+The `-Scope Process` option only applies to the current PowerShell window.
+
+## What It Collects
+
+The collectors gather read-only audit data:
+
+- System information: extraction time, computer name, logged-in user, domain/workgroup, OS caption, version, build number, architecture, install date.
+- Hardware information: manufacturer, model, CPU, RAM, motherboard, BIOS serial, physical disks, active MAC addresses.
+- Windows licensing information from CIM and read-only `slmgr` diagnostics.
+- Office licensing information from read-only `ospp.vbs /dstatusall`, when Office licensing scripts are present.
+- Suspicious activation-related indicators from installed apps, processes, services, scheduled tasks, startup entries, and optional limited file-name scanning.
+
+## Data Protection
+
+Sensitive values are masked before report export:
+
+- Usernames become `<REDACTED_USER>`.
+- MAC addresses have middle bytes masked.
+- Serial-like values show only the first 3 and last 4 characters.
+- Full product-key-like values are masked.
+- Full Windows, Office, and OEM product keys are never collected or printed.
+
+See [docs/privacy.md](docs/privacy.md) for details.
+
+## Reports
+
+Reports are written to `exports\` by default:
+
+- `windows-license-audit-*.json`: normalized machine-readable data.
+- `windows-license-audit-*.html`: administrative-style report for review.
+
+The HTML report includes:
+
+- Title and extraction metadata.
+- PC name and logged-in account.
+- Hardware fingerprint table.
+- Windows/license table.
+- Office/license table.
+- Automatic comments/verdict section.
+- Signature section.
+
+## Rule Engine
+
+Collectors only collect data. The rule engine produces verdicts and risk scoring.
+
+Verdicts include:
+
+- `CLEAN`
+- `GENUINE_LIKELY`
+- `ACTIVATED_REVIEW_REQUIRED`
+- `NOT_ACTIVATED`
+- `SUSPICIOUS`
+- `HIGH_RISK`
+- `NEED_MANUAL_REVIEW`
+
+Trusted KMS hosts are configured in [config/trusted-kms-hosts.json](config/trusted-kms-hosts.json). KMS results require organization context and should be reviewed by an administrator.
+
+See [docs/limitations.md](docs/limitations.md) for interpretation limits.
+
+## Suspicious Indicator Scan
+
+Suspicious keyword matching uses [config/suspicious-keywords.json](config/suspicious-keywords.json).
+
+The default run checks:
+
+- Installed application uninstall registry keys.
+- Running processes.
+- Windows services.
+- Scheduled tasks.
+- Startup `Run` and `RunOnce` registry keys.
+
+`-IncludeSuspiciousScan` also enables a limited file-name scan in:
+
+- `C:\ProgramData`
+- Current user's Desktop
+- Current user's Downloads
+- Current user's AppData Local
+- Current user's AppData Roaming
+
+The file scan does not scan the whole `C:\` drive and does not open file contents.
+
+## Tests
+
+Rule-engine tests use Pester and fixture JSON files under `tests\fixtures`. They do not query the local machine.
+
+Run Pester tests:
+
+```powershell
+Invoke-Pester .\tests\RuleEngine.Tests.ps1
+```
+
+Run the lightweight fallback test script:
+
+```powershell
+.\tests\Invoke-RuleEngineTests.ps1
+```
+
+## Packaging
+
+To move the tool to another machine, copy the whole project folder and keep this structure:
+
+```text
+windows-license-audit-tool/
+├── run-audit.ps1
+├── src/
+├── config/
+├── docs/
+├── tests/
+└── README.md
+```
+
+Then run:
+
+```powershell
+powershell.exe -ExecutionPolicy Bypass -NoProfile -File .\run-audit.ps1
 ```
 
 ## Project Layout
 
 ```text
 windows-license-audit-tool/
+├── run-audit.ps1
 ├── src/
 │   ├── main.ps1
 │   ├── collectors/
@@ -81,14 +183,13 @@ windows-license-audit-tool/
 │   ├── report/
 │   └── utils/
 ├── config/
-├── exports/
-├── tests/
 ├── docs/
+├── tests/
+├── exports/
+├── huong_dan.md
 └── README.md
 ```
 
-## Development Notes
+## Safety Boundary
 
-Add future collector implementations behind the existing placeholder functions. Prefer read-only APIs such as CIM/WMI queries and registry reads where appropriate. Any future command that can modify licensing state is out of scope for this tool.
-
-Report generation should continue to use the normalized schema emitted before JSON export, so later HTML, DOCX, and PDF renderers share one data contract.
+This tool must remain read-only. Any command or code path that activates software, changes keys, deletes files, removes software, stops services, modifies scheduled tasks, or changes licensing policy is out of scope.
