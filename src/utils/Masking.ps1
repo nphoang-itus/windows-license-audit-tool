@@ -43,6 +43,7 @@ function Protect-AuditReportSensitiveData {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
+        [AllowNull()]
         [object]$InputObject
     )
 
